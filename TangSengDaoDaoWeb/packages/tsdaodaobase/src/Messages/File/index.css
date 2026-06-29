@@ -71,20 +71,25 @@
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
 }
 
-.wk-message-file-menu a {
+.wk-message-file-menu a,
+.wk-message-file-menu button {
     display: block;
     width: 100%;
     box-sizing: border-box;
     padding: 8px 14px;
+    border: 0;
+    background: transparent;
     color: #1f2937;
     cursor: pointer;
+    font-family: inherit;
     font-size: 13px;
     line-height: 18px;
     text-align: left;
     text-decoration: none;
 }
 
-.wk-message-file-menu a:hover {
+.wk-message-file-menu a:hover,
+.wk-message-file-menu button:hover {
     background: rgba(236, 93, 65, 0.08);
     color: var(--wk-color-theme);
 }
@@ -95,11 +100,13 @@ body[theme-mode=dark] .wk-message-file-menu {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
 }
 
-body[theme-mode=dark] .wk-message-file-menu a {
+body[theme-mode=dark] .wk-message-file-menu a,
+body[theme-mode=dark] .wk-message-file-menu button {
     color: rgba(255, 255, 255, 0.9);
 }
 
-body[theme-mode=dark] .wk-message-file-menu a:hover {
+body[theme-mode=dark] .wk-message-file-menu a:hover,
+body[theme-mode=dark] .wk-message-file-menu button:hover {
     background: rgba(255, 255, 255, 0.08);
     color: #ffffff;
 }

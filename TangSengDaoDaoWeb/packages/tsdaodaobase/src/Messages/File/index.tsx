@@ -142,6 +142,12 @@ export class FileCell extends MessageCell<MessageBaseCellProps, FileCellState> {
         window.open(downloadURL)
     }
 
+    forward() {
+        const { message, context } = this.props
+        this.hideMenu()
+        context.fowardMessageUI(message.message)
+    }
+
     menuStyle() {
         const { menuX, menuY } = this.state
         return {
@@ -181,7 +187,7 @@ export class FileCell extends MessageCell<MessageBaseCellProps, FileCellState> {
                 event.stopPropagation()
                 const rect = this.$fileCard?.getBoundingClientRect()
                 const menuWidth = 92
-                const menuHeight = 84
+                const menuHeight = 120
                 const x = rect ? Math.max(8, Math.min(event.clientX - rect.left, rect.width - menuWidth - 8)) : 8
                 const y = rect ? Math.max(8, Math.min(event.clientY - rect.top, rect.height - menuHeight - 8)) : 8
                 this.setState({
@@ -205,6 +211,7 @@ export class FileCell extends MessageCell<MessageBaseCellProps, FileCellState> {
                 }}>
                     <a href={previewURL} target="_blank" rel="noreferrer" onClick={() => this.hideMenu()}>预览</a>
                     <a href={downloadURL} target="_blank" rel="noreferrer" onClick={() => this.hideMenu()}>下载</a>
+                    <button type="button" onClick={() => this.forward()}>转发</button>
                 </div> : null}
             </div>
         </MessageBase>

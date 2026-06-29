@@ -1,0 +1,6 @@
+<svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+  <rect width="160" height="160" rx="34" fill="#FCE7F3"/>
+  <path d="M80 28c16 21 33 28 54 32-9 16-12 32-8 54-20-5-35-3-46 15-12-18-27-20-47-15 4-22 1-38-8-54 21-4 38-11 55-32z" fill="#F472B6" stroke="#BE185D" stroke-width="7" stroke-linejoin="round"/>
+  <text x="80" y="84" text-anchor="middle" font-size="26" font-family="Arial, sans-serif" font-weight="800" fill="#FFFFFF">好耶</text>
+  <text x="80" y="131" text-anchor="middle" font-size="22" font-family="Arial, sans-serif" font-weight="700" fill="#9D174D">保持这个节奏</text>
+</svg>

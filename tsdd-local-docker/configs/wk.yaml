@@ -1,0 +1,15 @@
+mode: "debug"
+tokenAuthOn: true
+
+external:
+  ip: "127.0.0.1"
+  tcpAddr: "127.0.0.1:5100"
+  wsAddr: "ws://127.0.0.1:5200"
+  monitorAddr: "127.0.0.1:5300"
+  apiUrl: "http://127.0.0.1:5001"
+
+webhook:
+  grpcAddr: "tangsengdaodaoserver:6979"
+
+conversation:
+  on: true

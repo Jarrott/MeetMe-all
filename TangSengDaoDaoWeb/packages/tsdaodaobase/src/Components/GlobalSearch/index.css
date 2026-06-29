@@ -1,0 +1,34 @@
+.wk-globalsearch {
+    width: 100%;
+}
+
+.wk-globalsearch-title {
+    width: 100%;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.wk-globalsearch-inline {
+    box-sizing: border-box;
+    padding: 10px;
+    border: var(--wk-line);
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14);
+}
+
+body[theme-mode=dark] .wk-globalsearch-inline {
+    background-color: var(--wk-color-secondary);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.32);
+}
+
+.wk-globalsearch-inline .wk-search-tabs {
+    max-height: min(560px, calc(100vh - 150px));
+    overflow-y: auto;
+}
+
+.wk-globalsearch-inline .semi-tabs-content {
+    padding-top: 4px;
+}

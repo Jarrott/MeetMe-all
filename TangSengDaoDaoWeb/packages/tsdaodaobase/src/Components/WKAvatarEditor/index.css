@@ -1,0 +1,75 @@
+.wk-avatar-editor {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 20px 0 12px;
+}
+
+.wk-avatar-editor-canvas {
+    width: 392px;
+    max-width: calc(100vw - 48px);
+    display: flex;
+    justify-content: center;
+}
+
+.wk-avatar-editor-canvas canvas {
+    max-width: 100%;
+    height: auto !important;
+}
+
+.wk-avatar-editor-controls {
+    width: 392px;
+    max-width: calc(100vw - 48px);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.wk-avatar-editor-control {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 48px;
+    align-items: center;
+    gap: 10px;
+    color: var(--wk-text-item);
+    font-size: 14px;
+}
+
+.wk-avatar-editor-control input[type="range"] {
+    width: 100%;
+    accent-color: var(--wk-color-theme);
+}
+
+.wk-avatar-editor-control em {
+    color: var(--wk-color-font-tip);
+    font-style: normal;
+    text-align: right;
+}
+
+.wk-avatar-editor-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.wk-avatar-editor-actions button {
+    min-width: 64px;
+    height: 32px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 6px;
+    background: #ffffff;
+    color: var(--wk-text-item);
+    cursor: pointer;
+}
+
+.wk-avatar-editor-actions button:hover {
+    border-color: var(--wk-color-theme);
+    color: var(--wk-color-theme);
+}
+
+body[theme-mode=dark] .wk-avatar-editor-actions button {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: var(--wk-color-secondary);
+    color: rgba(255, 255, 255, 0.9);
+}

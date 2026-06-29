@@ -1,0 +1,7 @@
+<svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+  <rect width="160" height="160" rx="34" fill="#F1F5F9"/>
+  <circle cx="80" cy="72" r="43" fill="#94A3B8" stroke="#475569" stroke-width="7"/>
+  <path d="M65 59c2-12 13-20 27-16 14 4 19 20 8 30-8 8-15 10-16 21" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="83" cy="110" r="6" fill="#FFFFFF"/>
+  <text x="80" y="143" text-anchor="middle" font-size="20" font-family="Arial, sans-serif" font-weight="800" fill="#334155">我看看</text>
+</svg>

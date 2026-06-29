@@ -1,0 +1,343 @@
+
+.wk-conversationlist {
+    height: 100%;
+    overflow-y: auto;
+    /* padding: 0px 5px; */
+}
+
+.wk-conversationlist-section-label {
+    height: 26px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    background-color: transparent;
+    color: var(--wk-color-font-tip);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    box-sizing: border-box;
+}
+
+.wk-conversationlist-team-label {
+    width: calc(100% - 16px);
+    height: 34px;
+    margin: 6px 8px 2px 8px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 0;
+    border-radius: 7px;
+    background-color: #f4f6f8;
+    color: var(--wk-color-theme);
+    font-size: 13px;
+    font-weight: 700;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-align: left;
+}
+
+.wk-conversationlist-team-label:hover {
+    background-color: rgba(246, 96, 62, 0.08);
+}
+
+.wk-conversationlist-team-arrow {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid currentColor;
+    flex-shrink: 0;
+    transition: transform 120ms ease;
+}
+
+.wk-conversationlist-team-collapsed .wk-conversationlist-team-arrow {
+    transform: rotate(-90deg);
+}
+
+.wk-conversationlist-team-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.wk-conversationlist-team-count {
+    min-width: 22px;
+    height: 18px;
+    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background-color: rgba(246, 96, 62, 0.12);
+    color: var(--wk-color-theme);
+    font-size: 12px;
+    font-weight: 700;
+    box-sizing: border-box;
+}
+
+body[theme-mode=dark] .wk-conversationlist-team-label {
+    background-color: var(--wk-color-secondary);
+    color: var(--wk-color-theme);
+}
+
+.wk-conversationlist-section-label::before,
+.wk-conversationlist-section-label::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background-color: rgba(9, 30, 66, 0.12);
+}
+
+.wk-conversationlist-section-label span {
+    flex-shrink: 0;
+}
+
+body[theme-mode=dark] .wk-conversationlist-section-label {
+    background-color: transparent;
+    color: var(--wk-color-font-tip);
+}
+
+body[theme-mode=dark] .wk-conversationlist-section-label::before,
+body[theme-mode=dark] .wk-conversationlist-section-label::after {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+.wk-conversationlist-item {
+    height: 80px;
+    width: 100%;
+    cursor: pointer;
+    padding: 0px 5px;
+    background-color: white;
+    box-sizing: border-box;
+}
+
+body[theme-mode=dark] .wk-conversationlist-item  {
+    background-color: var(--wk-color-secondary-2);
+}
+
+.wk-conversationlist-item-top {
+    background-color: var(--wk-color-secondary) !important;
+}
+
+.wk-conversationlist-item-content {
+    display: flex;
+    height: 100%;
+}
+
+.wk-conversationlist-item-left {
+    width: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wk-conversationlist-item-right {
+    height: 100%;
+    width: calc(100% - 70px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-right: 10px;
+    padding-left: 5px;
+
+    flex-grow: 1;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.wk-conversationlist-item-avatar-box {
+    margin-left: 4px;
+    position: relative;
+   
+}
+
+.wk-conversationlist-item-right-first-line {
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.wk-conversationlist-item-right-second-line {
+    display: flex;
+}
+
+.wk-conversationlist-item-name {
+    display: flex;
+    width: 100%; 
+    flex: 1;
+    align-items: center;
+
+   
+}
+
+.wk-conversationlist-item-name h3 {
+    font-size: 1rem;
+    line-height: 1.6875rem;
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: auto;
+    max-width: 80%;
+}
+
+body[theme-mode=dark] .wk-conversationlist-item-name h3 {
+    color: white;
+}
+
+.wk-conversationlist-item-selected .wk-conversationlist-item-name h3,.wk-conversationlist-item-selected .wk-conversationlist-item-name  {
+    color: white;
+}
+
+.wk-conversationlist-item-time {
+    color: #9b9b9b;
+    padding-left: 10px;
+    flex-shrink: 0;
+    font-size: .75rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.wk-conversationlist-item-selected .wk-conversationlist-item-time {
+    color: white;
+   
+}
+
+
+.wk-conversationlist-item-lastmsg {
+    width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--wk-color-font-tip);
+    overflow: hidden;
+    font-size: 14px;
+    min-height: 22px;
+}
+
+.wk-conversationlist-item-selected .wk-conversationlist-item-lastmsg {
+    color: white;
+}
+
+.wk-conversationlist-item-selected {
+    background-color: var(--wk-color-theme);
+    border-radius: 10px;
+}
+
+.wk-mention {
+    color: red;
+}
+
+.wk-reminder {
+    color: red;
+}
+
+.wk-onlinestatusbadge {
+    background-color: var(--wk-color-item);
+    position: absolute;
+    padding: 1.5px;
+    transform: scale(0.6);
+    right: -10px;
+    bottom: -5px;
+    border-radius: 10px;
+
+}
+.wk-onlinestatusbadge-empty.wk-onlinestatusbadge {
+    border-radius: 50%;
+    right: -1px;
+    bottom: -1px;
+} 
+
+.wk-onlinestatusbadge-content {
+    background-color: rgb(238, 249, 233);
+    padding: 0px 5px;
+    border-radius: 10px;
+}
+.wk-onlinestatusbadge-content-tip {
+    padding: 0px;
+    font-size: 14px;
+    color: rgb(124, 208, 83);
+    
+}
+
+.wk-onlinestatusbadge-empty  .wk-onlinestatusbadge-content {
+    background-color: rgb(124, 208, 83);
+    border-radius: 50%;
+    padding: 0px;
+}
+
+.wk-onlinestatusbadge-empty .wk-onlinestatusbadge-content-tip{
+    padding: 8px;
+}
+
+.wk-conversation-team-create {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.wk-conversation-team-manage-list {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wk-conversation-team-manage-row {
+    min-height: 38px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.wk-conversation-team-manage-row span {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--wk-color-font);
+}
+
+body[theme-mode=dark] .wk-conversation-team-manage-row span {
+    color: white;
+}
+
+.wk-conversation-team-move-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wk-conversation-team-move-list button {
+    min-height: 40px;
+    border: var(--wk-line);
+    border-radius: 6px;
+    background-color: white;
+    color: var(--wk-color-font);
+    cursor: pointer;
+    text-align: left;
+    padding: 0 12px;
+}
+
+.wk-conversation-team-move-list button:hover {
+    color: var(--wk-color-theme);
+    border-color: var(--wk-color-theme);
+}
+
+body[theme-mode=dark] .wk-conversation-team-move-list button {
+    background-color: var(--wk-color-secondary);
+    color: white;
+}
+
+.wk-conversation-team-empty {
+    color: var(--wk-color-font-tip);
+    font-size: 14px;
+    line-height: 22px;
+}

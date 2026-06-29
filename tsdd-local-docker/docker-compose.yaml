@@ -1,0 +1,139 @@
+services:
+  wukongim:
+    image: wukongim/wukongim:latest
+    restart: unless-stopped
+    ports:
+      - "5100:5100"
+      - "5200:5200"
+      - "5300:5300"
+    volumes:
+      - ./configs/wk.yaml:/root/wukongim/wk.yaml:ro
+      - ./logs/wk:/root/wukongim/logs
+
+  tangsengdaodaoserver:
+    image: tsdd-local-server:dev
+    build:
+      context: ../TangSengDaoDaoServer
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: "api"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_TRANSLATE_MODEL: ${OPENAI_TRANSLATE_MODEL:-gpt-4o-mini}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-}
+      RESEND_API_URL: ${RESEND_API_URL:-https://api.resend.com/emails}
+      SMS_PROVIDER: ${SMS_PROVIDER:-}
+      SMS_VERIFICATION_TEMPLATE: ${SMS_VERIFICATION_TEMPLATE:-}
+      YIT_SMS_API_BASE_URL: ${YIT_SMS_API_BASE_URL:-https://api.3yit.com}
+      YIT_SMS_API_PATH: ${YIT_SMS_API_PATH:-api/send-sms-single}
+      YIT_SMS_API_URL: ${YIT_SMS_API_URL:-}
+      YIT_SMS_SPID: ${YIT_SMS_SPID:-}
+      YIT_SMS_PASSWORD: ${YIT_SMS_PASSWORD:-}
+      YIT_SMS_EXT: ${YIT_SMS_EXT:-}
+      TEXTBOOST_SMS_API_URL: ${TEXTBOOST_SMS_API_URL:-}
+      TEXTBOOST_API_KEY: ${TEXTBOOST_API_KEY:-}
+      TEXTBOOST_FROM: ${TEXTBOOST_FROM:-}
+      MESSAGE_RECORD_VIEW_PASSWORD: ${MESSAGE_RECORD_VIEW_PASSWORD:-superadmin}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      wukongim:
+        condition: service_started
+      minio:
+        condition: service_healthy
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./configs/tsdd.yaml:/home/configs/tsdd.yaml:ro
+      - ./logs/tsdd:/home/logs
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -Y off -O /dev/null http://localhost:8090/v1/ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  tangsengdaodaoweb:
+    image: tsdd-local-web:dev
+    build:
+      context: ../TangSengDaoDaoWeb
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      API_URL: ${API_URL}
+    depends_on:
+      tangsengdaodaoserver:
+        condition: service_healthy
+    ports:
+      - "8082:80"
+
+  tangsengdaodaomanager:
+    image: tsdd-local-manager:dev
+    build:
+      context: ../TangSengDaoDaoManager
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      API_URL: ${API_URL}
+    depends_on:
+      tangsengdaodaoserver:
+        condition: service_healthy
+    ports:
+      - "8083:80"
+
+  mysql:
+    image: mysql:8.0.33
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: "server /data --console-address ':9001'"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_SERVER_URL: http://127.0.0.1:9000
+      MINIO_BROWSER_REDIRECT_URL: http://127.0.0.1:9001
+    volumes:
+      - ./data/minio:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8306:8080"

@@ -1,0 +1,7 @@
+<svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+  <rect width="160" height="160" rx="34" fill="#FFE4E6"/>
+  <path d="M91 22 41 89h35l-8 49 51-70H84z" fill="#FB7185" stroke="#BE123C" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="121" cy="36" r="10" fill="#FDBA74"/>
+  <circle cx="35" cy="124" r="8" fill="#FDBA74"/>
+  <text x="80" y="132" text-anchor="middle" font-size="23" font-family="Arial, sans-serif" font-weight="700" fill="#9F1239">开冲</text>
+</svg>

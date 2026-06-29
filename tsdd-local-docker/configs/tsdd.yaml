@@ -1,0 +1,28 @@
+mode: "debug"
+adminPwd: "local_admin_123456"
+smsCode: "123456"
+
+wukongIM:
+  apiURL: "http://wukongim:5001"
+  managerToken: ""
+
+db:
+  mysqlAddr: "root:local_mysql_123456@tcp(mysql)/im?charset=utf8mb4&parseTime=true&loc=Local"
+  redisAddr: "redis:6379"
+
+external:
+  ip: "127.0.0.1"
+  baseURL: "http://127.0.0.1:8090"
+  webLoginURL: "http://127.0.0.1:8082"
+
+fileService: "minio"
+minio:
+  url: "http://127.0.0.1:9000"
+  uploadURL: "http://minio:9000"
+  downloadURL: "http://127.0.0.1:9000"
+  accessKeyID: "minio"
+  secretAccessKey: "local_minio_123456"
+
+avatar:
+  defaultBaseURL: ""
+  default: "assets/assets/avatar.png"

@@ -1,0 +1,5 @@
+<svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+  <rect width="160" height="160" rx="34" fill="#DBEAFE"/>
+  <path d="M48 82c13-9 21-22 25-40 2-9 15-8 17 1 2 9-1 21-5 28h28c10 0 17 9 14 19l-8 30c-2 9-10 15-19 15H60c-10 0-18-8-18-18V96c0-6 2-11 6-14z" fill="#3B82F6" stroke="#1D4ED8" stroke-width="6" stroke-linejoin="round"/>
+  <text x="80" y="124" text-anchor="middle" font-size="26" font-family="Arial, sans-serif" font-weight="800" fill="#FFFFFF">不错</text>
+</svg>

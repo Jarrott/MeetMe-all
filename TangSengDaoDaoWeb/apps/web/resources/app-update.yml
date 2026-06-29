@@ -1,0 +1,3 @@
+provider: generic
+url: https://api.meetme.im/
+updaterCacheDirName: '@tsdaodaoweb-updater'

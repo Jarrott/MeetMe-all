@@ -1,0 +1,7 @@
+<svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+  <rect width="160" height="160" rx="34" fill="#EEF2FF"/>
+  <path d="M28 48h104v66H28z" fill="#FFFFFF" stroke="#4F46E5" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M28 48 80 88l52-40" fill="none" stroke="#4F46E5" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M51 112h58" stroke="#A5B4FC" stroke-width="8" stroke-linecap="round"/>
+  <text x="80" y="139" text-anchor="middle" font-size="23" font-family="Arial, sans-serif" font-weight="700" fill="#3730A3">已阅</text>
+</svg>

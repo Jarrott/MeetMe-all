@@ -1,0 +1,109 @@
+.wk-message-file {
+    width: 260px;
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+}
+
+.wk-message-file-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.wk-message-file-icon img {
+    width: 28px;
+    height: 28px;
+}
+
+.wk-message-file-info {
+    min-width: 0;
+    margin-left: 10px;
+    flex: 1 1 auto;
+}
+
+.wk-message-file-name {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wk-message-file-size {
+    color: var(--wk-color-font-tip);
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.wk-message-file-progress {
+    width: 100%;
+    height: 4px;
+    margin-top: 4px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.1);
+}
+
+.wk-message-file-progress-inner {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--wk-color-theme);
+    transition: width 0.18s ease;
+}
+
+.wk-message-file-menu {
+    position: absolute;
+    z-index: 9999;
+    width: 92px;
+    padding: 6px 0;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+}
+
+.wk-message-file-menu a {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 14px;
+    color: #1f2937;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 18px;
+    text-align: left;
+    text-decoration: none;
+}
+
+.wk-message-file-menu a:hover {
+    background: rgba(236, 93, 65, 0.08);
+    color: var(--wk-color-theme);
+}
+
+body[theme-mode=dark] .wk-message-file-menu {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: #1f2937;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+}
+
+body[theme-mode=dark] .wk-message-file-menu a {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+body[theme-mode=dark] .wk-message-file-menu a:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+body[theme-mode=dark] .wk-message-file-progress {
+    background: rgba(255, 255, 255, 0.16);
+}

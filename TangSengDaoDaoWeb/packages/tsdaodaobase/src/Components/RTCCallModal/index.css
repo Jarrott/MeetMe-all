@@ -1,0 +1,153 @@
+.wk-rtc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12, 20, 36, 0.36);
+}
+
+.wk-rtc-card {
+  width: min(34rem, calc(100vw - 2rem));
+  border-radius: 1.25rem;
+  background: #111827;
+  color: #fff;
+  box-shadow: 0 1.5rem 4rem rgba(15, 23, 42, 0.38);
+  overflow: hidden;
+}
+
+.wk-rtc-header {
+  height: 3.75rem;
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.wk-rtc-state {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.68);
+  font-weight: 500;
+}
+
+.wk-rtc-audio-stage,
+.wk-rtc-video-stage {
+  min-height: 22rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: linear-gradient(145deg, #172033, #0f172a);
+}
+
+.wk-rtc-audio-stage {
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.wk-rtc-peer-avatar {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.3);
+}
+
+.wk-rtc-peer-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.wk-rtc-status {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.wk-rtc-remote-video {
+  width: 100%;
+  height: 22rem;
+  object-fit: cover;
+  background: #0f172a;
+}
+
+.wk-rtc-video-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 1rem;
+}
+
+.wk-rtc-video-placeholder .semi-icon {
+  font-size: 2.5rem;
+}
+
+.wk-rtc-local-video {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  width: 8.75rem;
+  height: 6.25rem;
+  border-radius: 0.875rem;
+  object-fit: cover;
+  background: #0f172a;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.wk-rtc-actions {
+  min-height: 5.25rem;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: #111827;
+}
+
+.wk-rtc-action,
+.wk-rtc-icon-action {
+  border: 0;
+  cursor: pointer;
+  color: #fff;
+}
+
+.wk-rtc-action {
+  min-width: 7.5rem;
+  height: 2.875rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.wk-rtc-action.accept {
+  background: #22c55e;
+}
+
+.wk-rtc-action.danger,
+.wk-rtc-icon-action.danger {
+  background: #ef4444;
+}
+
+.wk-rtc-icon-action {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 1.35rem;
+}
+
+.wk-rtc-icon-action:hover,
+.wk-rtc-action:hover {
+  filter: brightness(1.06);
+}

@@ -1,0 +1,5 @@
+<svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+  <rect width="160" height="160" rx="34" fill="#EDE9FE"/>
+  <path d="M52 45c-8 5-12 14-9 25 6 24 25 43 49 49 11 3 20-1 25-9l5-9c3-5 1-11-4-14l-16-9c-5-3-11-1-14 4l-3 5c-10-5-18-13-23-23l5-3c5-3 7-9 4-14l-9-16c-3-5-9-7-14-4z" fill="#8B5CF6" stroke="#6D28D9" stroke-width="6" stroke-linejoin="round"/>
+  <text x="80" y="134" text-anchor="middle" font-size="22" font-family="Arial, sans-serif" font-weight="800" fill="#5B21B6">电话说</text>
+</svg>

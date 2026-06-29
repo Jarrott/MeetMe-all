@@ -1,0 +1,19 @@
+.wk-rtc-toolbar-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--wk-color-theme);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  font-size: 1.25rem;
+  padding: 0;
+}
+
+.wk-rtc-toolbar-button:hover {
+  background: rgba(48, 112, 245, 0.08);
+  color: #3070f5;
+}

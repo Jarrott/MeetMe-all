@@ -1,0 +1,47 @@
+.wk-message-rtc {
+  min-width: 11rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: inherit;
+}
+
+.wk-message-rtc-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.18);
+  color: currentColor;
+  flex: 0 0 auto;
+}
+
+.wk-message-base-bubble-box.recv .wk-message-rtc-icon {
+  background: rgba(48, 112, 245, 0.1);
+  color: #3070f5;
+}
+
+.wk-message-rtc-main {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.wk-message-rtc-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.wk-message-rtc-duration {
+  font-size: 0.75rem;
+  opacity: 0.76;
+}
+
+.wk-message-rtc .messageMeta {
+  top: 0;
+  align-self: flex-end;
+}

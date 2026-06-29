@@ -1,0 +1,196 @@
+.wk-message-text {
+    word-wrap: break-word;
+    word-break: break-all;
+    width: 100%;
+}
+
+.wk-message-text  pre {
+    margin-bottom: 0;
+    white-space: pre-wrap; /*css-3*/
+    white-space: -moz-pre-wrap; /*Mozilla,since1999*/
+    white-space: -pre-wrap; /*Opera4-6*/
+    white-space: -o-pre-wrap; /*Opera7*/
+    word-wrap: break-word; /*InternetExplorer5.5+*/
+    font-family: Helvetica;
+}
+
+.wk-message-text-richtext {
+    
+}
+
+.wk-message-text-richmention {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.wk-message-text-send {
+    color: white;
+}
+
+.wk-message-text-recv {
+    color: black;
+}
+
+body[theme-mode=dark] .wk-message-text-recv {
+    color: white;
+}
+
+.wk-message-text-richemoji {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: -5px;
+}
+
+.wk-message-text-richemoji img {
+    width: 22px;
+    height: 22px;
+    transform-origin: center bottom;
+    animation: wk-message-emoji-soft-pop 2.8s ease-in-out infinite;
+}
+
+.wk-message-text-content-largeemoji {
+    line-height: 1.05;
+    overflow: visible;
+}
+
+.wk-message-text-content-largeemoji .wk-message-text-richemoji img {
+    width: 58px;
+    height: 58px;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.14));
+    animation: wk-message-emoji-big-pop 1.7s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.wk-message-text-content-largeemoji .wk-message-text-richemoji:nth-child(2n) img {
+    animation-delay: 0.16s;
+}
+
+.wk-message-text-content-largeemoji .wk-message-text-richemoji:nth-child(3n) img {
+    animation-delay: 0.32s;
+}
+
+.wk-message-text-content-largeemoji .messageMeta {
+    margin-left: 6px;
+    vertical-align: bottom;
+}
+
+@keyframes wk-message-emoji-soft-pop {
+    0%, 100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+    }
+    48% {
+        transform: translateY(-1px) scale(1.05) rotate(-1deg);
+    }
+    56% {
+        transform: translateY(0) scale(0.98) rotate(1deg);
+    }
+}
+
+@keyframes wk-message-emoji-big-pop {
+    0%, 100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.14));
+    }
+    35% {
+        transform: translateY(-7px) scale(1.16) rotate(-4deg);
+        filter: drop-shadow(0 13px 16px rgba(0, 0, 0, 0.18));
+    }
+    52% {
+        transform: translateY(1px) scale(0.96) rotate(3deg);
+    }
+    68% {
+        transform: translateY(-2px) scale(1.05) rotate(-1deg);
+    }
+}
+
+.wk-message-text-reply {
+    display: flex;
+    width: 100%;
+    margin-bottom: 6px;
+    padding: 0 0 7px 9px;
+    border-left: 3px solid rgba(255, 255, 255, 0.62);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+    color: rgb(255, 255, 255,0.72);
+    font-size: 14px;
+    flex-direction: column;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.wk-message-text-reply.wk-message-text-reply-recv {
+    border-left-color: var(--wk-color-theme);
+    border-bottom-color: rgba(15, 23, 42, 0.12);
+    color: rgb(0, 0, 0,0.58);
+}
+
+
+.wk-message-text-reply-author {
+    display: flex;
+    align-items: center;
+}
+
+.wk-message-text-reply-authoravatar {
+    margin-right: 4px;
+}
+
+.wk-message-text-reply-content { 
+    width:100%;
+	word-break:break-all;
+	display:-webkit-box;
+	-webkit-line-clamp:1;
+	-webkit-box-orient:vertical;
+	overflow:hidden;
+    color: inherit;
+}
+
+.wk-message-text-content {
+    margin: 0;
+    word-break: break-word;
+    line-height: 1.3125;
+    text-align: initial;
+    display: flow-root;
+    unicode-bidi: plaintext;
+}
+
+.wk-message-text-translation {
+    width: 100%;
+    margin-top: 8px;
+    padding-top: 7px;
+    border-top: 1px solid rgba(15, 23, 42, 0.12);
+    color: rgba(15, 23, 42, 0.62);
+    font-size: 13px;
+    line-height: 1.38;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.wk-message-text-translation-send {
+    border-top-color: rgba(255, 255, 255, 0.28);
+    color: rgba(255, 255, 255, 0.78);
+}
+
+body[theme-mode=dark] .wk-message-text-translation {
+    border-top-color: rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.68);
+}
+
+.wk-message-text-edit-history {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wk-message-text-edit-history-title {
+    color: var(--wk-color-font-tip);
+    font-size: 13px;
+}
+
+.wk-message-text-edit-history-content {
+    min-height: 42px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.06);
+    color: var(--wk-text-item);
+    white-space: pre-wrap;
+    word-break: break-word;
+}

@@ -1,0 +1,7 @@
+-- +migrate Up
+
+ALTER TABLE `group` MODIFY COLUMN `name` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '群名字';
+
+-- +migrate Down
+
+ALTER TABLE `group` MODIFY COLUMN `name` VARCHAR(40) NOT NULL DEFAULT '' COMMENT '群名字';

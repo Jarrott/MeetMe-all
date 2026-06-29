@@ -8,12 +8,23 @@ const feedUrl = `${TSDD_FONFIG.updataUrl}v1/common/pcupdater/`;
 let mainWindow: BrowserWindow;
 // 封装更新相关的进程通信方法
 const sendUpdateMessage = (opt: { cmd: string; data: any }) => {
-  mainWindow.webContents.send(opt.cmd, opt.data);
+  try {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send(opt.cmd, opt.data);
+    }
+  } catch (error) {
+    logger.error("send update message failed", error);
+  }
 };
 
 function checkUpdate(win: BrowserWindow) {
-  autoUpdater.logger = logger;
-  autoUpdater.disableWebInstaller = false;
+  try {
+    autoUpdater.logger = logger;
+    autoUpdater.disableWebInstaller = false;
+  } catch (error) {
+    logger.error("setup autoUpdater failed", error);
+    return;
+  }
   // 用于本地调试
   if (!app.isPackaged) {
     Object.defineProperty(app, "isPackaged", {
@@ -82,16 +93,32 @@ function checkUpdate(win: BrowserWindow) {
   ipcMain.on("check-update", () => {
     //执行自动更新检查
     logger.info("开始检查更新");
-    autoUpdater.checkForUpdates();
+    autoUpdater.checkForUpdates().catch((error) => {
+      logger.error("check update failed", error);
+      sendUpdateMessage({
+        cmd: "update-error",
+        data: error,
+      });
+    });
   });
 
   // 触发更新
   ipcMain.on("update-app", () => {
-    autoUpdater.downloadUpdate();
+    autoUpdater.downloadUpdate().catch((error) => {
+      logger.error("download update failed", error);
+      sendUpdateMessage({
+        cmd: "update-error",
+        data: error,
+      });
+    });
   });
   // 退出并安装更新包
   ipcMain.on("install-update", () => {
-    autoUpdater.quitAndInstall();
+    try {
+      autoUpdater.quitAndInstall();
+    } catch (error) {
+      logger.error("install update failed", error);
+    }
   });
 }
 

@@ -8,8 +8,7 @@ module.exports = {
   npmRebuild: false,
   asar: true,
   asarUnpack: [
-    "node_modules/node-screenshots-darwin-x64/**/*",
-    "node_modules/node-screenshots-darwin-arm64/**/*",
+    "node_modules/node-screenshots-*/**/*",
     "node_modules/electron-screenshots/**/*",
     "**/*.node"
   ],

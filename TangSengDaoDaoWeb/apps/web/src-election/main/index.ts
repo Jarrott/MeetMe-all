@@ -11,11 +11,12 @@ import {
   nativeImage,
   clipboard,
   session,
+  shell,
 } from "electron";
 import fs from "fs";
 import tmp from 'tmp';
-import Screenshots from "electron-screenshots";
 import { join } from "path";
+import logger from "electron-log";
 
 import logo, { getNoMessageTrayIcon } from "./logo";
 import TSDD_FONFIG from "./confing";
@@ -33,12 +34,161 @@ let settings: any = {};
 let screenShotWindowId = 0;
 let isFullScreen = false;
 let lastConversationUnreadCount = 0;
+let screenshotEventsRegistered = false;
 
 let isOsx = process.platform === "darwin";
 let isWin = !isOsx;
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 const WEB_APP_URL = "https://web.meetme.im";
+
+process.on("uncaughtException", (error) => {
+  logger.error("main uncaughtException", error);
+});
+
+process.on("unhandledRejection", (reason) => {
+  logger.error("main unhandledRejection", reason);
+});
+
+function isWindowAlive(win?: BrowserWindow | null) {
+  return !!win && !win.isDestroyed();
+}
+
+function ensureScreenshots() {
+  if (screenshots) {
+    return screenshots;
+  }
+  try {
+    const Screenshots = require("electron-screenshots").default || require("electron-screenshots");
+    screenshots = new Screenshots({
+      singleWindow: true,
+    });
+    setupScreenshotEvents();
+    return screenshots;
+  } catch (error) {
+    logger.error("screenshots init failed", error);
+    return undefined;
+  }
+}
+
+function setupScreenshotEvents() {
+  if (!screenshots || screenshotEventsRegistered) {
+    return;
+  }
+  screenshotEventsRegistered = true;
+  const onScreenShotEnd = (result?: any) => {
+    console.log(
+      "onScreenShotEnd",
+      isMainWindowFocusedWhenStartScreenshot,
+      screenShotWindowId
+    );
+    if (isMainWindowFocusedWhenStartScreenshot) {
+      if (result && isWindowAlive(mainWindow)) {
+        mainWindow.webContents.send("screenshots-ok", result);
+      }
+      if (isWindowAlive(mainWindow)) {
+        mainWindow.show();
+      }
+      isMainWindowFocusedWhenStartScreenshot = false;
+    } else if (screenShotWindowId) {
+      let windows = BrowserWindow.getAllWindows();
+      let tms = windows.filter(
+        (win) => win.webContents.id === screenShotWindowId
+      );
+      if (tms.length > 0 && !tms[0].isDestroyed()) {
+        if (result) {
+          tms[0].webContents.send("screenshots-ok", result);
+        }
+        tms[0].show();
+      }
+      screenShotWindowId = 0;
+    }
+  };
+  // 截图esc快捷键
+  screenshots.on('windowCreated', ($win: any) => {
+    $win.on('focus', () => {
+      globalShortcut.register('esc', () => {
+        try {
+          if ($win?.isFocused()) {
+            screenshots?.endCapture();
+          }
+        } catch (error) {
+          logger.error("screenshots esc failed", error);
+        }
+      });
+    });
+
+    $win.on('blur', () => {
+      globalShortcut.unregister('esc');
+    });
+  });
+
+  // 点击确定按钮回调事件
+  screenshots.on("ok", (e: any, buffer: any) => {
+    try {
+      let filename = tmp.tmpNameSync() + '.png';
+      let image = NativeImage.createFromBuffer(buffer);
+      fs.writeFileSync(filename, image.toPNG());
+
+      console.log("screenshots ok", e);
+      onScreenShotEnd({ filePath: filename });
+    } catch (error) {
+      logger.error("screenshots ok failed", error);
+      onScreenShotEnd();
+    }
+  });
+
+  // 点击取消按钮回调事件
+  screenshots.on("cancel", (e: any) => {
+    console.log("screenshots cancel", e);
+    onScreenShotEnd();
+  });
+  // 点击保存按钮回调事件
+  screenshots.on("save", (e: any) => {
+    console.log("screenshots save", e);
+    onScreenShotEnd();
+  });
+}
+
+function startScreenshotCapture() {
+  const screenshotInstance = ensureScreenshots();
+  if (!screenshotInstance) {
+    if (isWindowAlive(mainWindow)) {
+      mainWindow.webContents.send("screenshots-error", "截图组件初始化失败，请稍后重试");
+    }
+    return;
+  }
+  try {
+    screenshotInstance.startCapture();
+  } catch (error) {
+    logger.error("screenshots start failed", error);
+    if (isWindowAlive(mainWindow)) {
+      mainWindow.webContents.send("screenshots-error", "截图启动失败，请稍后重试");
+    }
+  }
+}
+
+function setupWindowSafety(win: BrowserWindow) {
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith(WEB_APP_URL)) {
+      return { action: "allow" };
+    }
+    shell.openExternal(url).catch((error) => logger.error("open external failed", error));
+    return { action: "deny" };
+  });
+  win.webContents.on("did-fail-load", (_event, errorCode, errorDescription, validatedURL) => {
+    logger.error("webContents did-fail-load", { errorCode, errorDescription, validatedURL });
+  });
+  win.webContents.on("render-process-gone", (_event, details) => {
+    logger.error("render-process-gone", details);
+    if (!win.isDestroyed()) {
+      win.reload();
+    }
+  });
+  win.on("unresponsive", () => {
+    logger.warn("window unresponsive");
+  });
+}
 
 
 let mainMenu: (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] = [
@@ -213,64 +363,89 @@ let trayMenu: Electron.MenuItemConstructorOptions[] = [
  */
 let flashTimer: any = null;
 function updateTray(unread = 0, isFlash= false): any {
-  settings.showOnTray = true;
+  try {
+    settings.showOnTray = true;
 
-  // linux 系统不支持 tray
-  if (process.platform === "linux") {
-    return;
-  }
-
-  if (settings.showOnTray) {
-    let contextmenu = Menu.buildFromTemplate(trayMenu);
-
-    if (!trayIcon) {
-      trayIcon = getNoMessageTrayIcon();
+    // linux 系统不支持 tray
+    if (process.platform === "linux") {
+      return;
     }
 
-    setTimeout(() => {
-      if (!tray) {
-        // Init tray icon
-        tray = new Tray(trayIcon);
-        if (process.platform === "linux") {
-          tray.setContextMenu(contextmenu);
-        }
+    if (settings.showOnTray) {
+      let contextmenu = Menu.buildFromTemplate(trayMenu);
 
-        tray.on("right-click", () => {
-          tray.popUpContextMenu(contextmenu);
-        });
-
-        tray.on("click", () => {
-          mainWindow.show();
-        });
+      if (!trayIcon) {
+        trayIcon = getNoMessageTrayIcon();
       }
 
-      if (isOsx) {
-        tray.setTitle(unread > 0 ? " " + unread : "");
-      }
+      setTimeout(() => {
+        try {
+          if (!tray) {
+            // Init tray icon
+            tray = new Tray(trayIcon);
+            if (process.platform === "linux") {
+              tray.setContextMenu(contextmenu);
+            }
 
-      mainWindow.flashFrame(isFlash);
-      //设置系统托盘闪烁
-      if(isFlash){
-        clearInterval(flashTimer)
-		    let flag = false
-        // 优化: 减少闪烁频率从500ms到1000ms，减少50%的CPU使用
-        flashTimer = setInterval(() => {
-          flag = !flag
-          if(flag){
-            tray.setImage(NativeImage.createEmpty());
+            tray.on("right-click", () => {
+              tray && tray.popUpContextMenu(contextmenu);
+            });
+
+            tray.on("click", () => {
+              if (isWindowAlive(mainWindow)) {
+                mainWindow.show();
+              }
+            });
+          }
+
+          if (!tray) {
+            return;
+          }
+
+          if (isOsx) {
+            tray.setTitle(unread > 0 ? " " + unread : "");
+          }
+
+          if (isWindowAlive(mainWindow)) {
+            mainWindow.flashFrame(isFlash);
+          }
+          //设置系统托盘闪烁
+          if(isFlash){
+            clearInterval(flashTimer)
+            let flag = false
+            // 优化: 减少闪烁频率从500ms到1000ms，减少50%的CPU使用
+            flashTimer = setInterval(() => {
+              try {
+                if (!tray) {
+                  clearInterval(flashTimer);
+                  return;
+                }
+                flag = !flag
+                if(flag){
+                  tray.setImage(NativeImage.createEmpty());
+                }else{
+                  tray.setImage(trayIcon);
+                }
+              } catch (error) {
+                logger.error("tray flash failed", error);
+                clearInterval(flashTimer);
+              }
+            },1000) // 从500ms改为1000ms，减少CPU使用
           }else{
             tray.setImage(trayIcon);
+            clearInterval(flashTimer);
           }
-      },1000) // 从500ms改为1000ms，减少CPU使用
-      }else{
-        tray.setImage(trayIcon);
-        clearInterval(flashTimer);
-      }
-    });
-  } else {
-    if (!tray) return;
-    tray.destroy();
-    tray = null;
+        } catch (error) {
+          logger.error("update tray delayed failed", error);
+        }
+      });
+    } else {
+      if (!tray) return;
+      tray.destroy();
+      tray = null;
+    }
+  } catch (error) {
+    logger.error("updateTray failed", error);
   }
 }
 
@@ -339,19 +514,23 @@ function attachContextMenu(win: BrowserWindow) {
 
 function regShortcut() {
   globalShortcut.register("CommandOrControl+shift+a", () => {
-    isMainWindowFocusedWhenStartScreenshot = mainWindow.isFocused();
+    isMainWindowFocusedWhenStartScreenshot = isWindowAlive(mainWindow) ? mainWindow.isFocused() : false;
     console.log(
       "isMainWindowFocusedWhenStartScreenshot",
-      mainWindow.isFocused()
+      isMainWindowFocusedWhenStartScreenshot
     );
-    screenshots.startCapture();
+    startScreenshotCapture();
   });
 
 
   // 打开所有窗口控制台
   globalShortcut.register("ctrl+shift+i", () => {
     let windows = BrowserWindow.getAllWindows();
-    windows.forEach((win: any) => win.openDevTools());
+    windows.forEach((win: any) => {
+      if (!win.isDestroyed()) {
+        win.webContents.openDevTools();
+      }
+    });
   });
 }
 
@@ -385,6 +564,7 @@ const getWindowConfig = () => {
 const createNewWindow = () => {
   const NODE_ENV = process.env.NODE_ENV;
   const newWindow = new BrowserWindow(getWindowConfig());
+  setupWindowSafety(newWindow);
   attachContextMenu(newWindow);
 
   newWindow.center();
@@ -417,6 +597,7 @@ const createNewWindow = () => {
 const createMainWindow = async () => {
   const NODE_ENV = process.env.NODE_ENV;
   mainWindow = new BrowserWindow(getWindowConfig());
+  setupWindowSafety(mainWindow);
   attachContextMenu(mainWindow);
   mainWindow.center();
   mainWindow.once("ready-to-show", () => {
@@ -445,7 +626,7 @@ const createMainWindow = async () => {
   ipcMain.on("screenshots-start", (event, args) => {
     console.log("main voip-message event", args);
     screenShotWindowId = event.sender.id;
-    screenshots.startCapture();
+    startScreenshotCapture();
   });
 
   ipcMain.on("get-media-access-status", async (event, mediaType: 'camera' | 'microphone')=>{
@@ -563,76 +744,6 @@ app.on("ready", () => {
   if (isWin) {
     app.setAppUserModelId("MeetMe");
   }
-
-  screenshots = new Screenshots({
-    singleWindow: true,
-  });
-
-  const onScreenShotEnd = (result?: any) => {
-    console.log(
-      "onScreenShotEnd",
-      isMainWindowFocusedWhenStartScreenshot,
-      screenShotWindowId
-    );
-    if (isMainWindowFocusedWhenStartScreenshot) {
-      if (result) {
-        mainWindow.webContents.send("screenshots-ok", result);
-      }
-      mainWindow.show();
-      isMainWindowFocusedWhenStartScreenshot = false;
-    } else if (screenShotWindowId) {
-      let windows = BrowserWindow.getAllWindows();
-      let tms = windows.filter(
-        (win) => win.webContents.id === screenShotWindowId
-      );
-      if (tms.length > 0) {
-        if (result) {
-          tms[0].webContents.send("screenshots-ok", result);
-        }
-        tms[0].show();
-      }
-      screenShotWindowId = 0;
-    }
-  };
-  // 截图esc快捷键
-  screenshots.on('windowCreated', ($win: any) => {
-    $win.on('focus', () => {
-      globalShortcut.register('esc', () => {
-        if ($win?.isFocused()) {
-          screenshots.endCapture();
-        }
-      });
-    });
-
-    $win.on('blur', () => {
-      globalShortcut.unregister('esc');
-    });
-  });
-
-  // 点击确定按钮回调事件
-  screenshots.on("ok", (e: any, buffer: any, bounds: any) => {
-    let filename = tmp.tmpNameSync() + '.png';
-    let image = NativeImage.createFromBuffer(buffer);
-    fs.writeFileSync(filename, image.toPNG());
-
-    console.log("screenshots ok", e);
-    onScreenShotEnd({ filePath: filename });
-  });
-
-  // 点击取消按钮回调事件
-  screenshots.on("cancel", (e: any) => {
-    // 执行了preventDefault
-    // 点击取消不会关闭截图窗口
-    // e.preventDefault()
-    // console.log('capture', 'cancel2')
-    console.log("screenshots cancel", e);
-    onScreenShotEnd();
-  });
-  // 点击保存按钮回调事件
-  screenshots.on("save", (e: any, { viewer }: any) => {
-    console.log("screenshots save", e);
-    onScreenShotEnd();
-  });
 
   try {
     updateTray();

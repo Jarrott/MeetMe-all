@@ -8,6 +8,7 @@ import MessageTrail from "../Base/tail"
 import { MessageCell } from "../MessageCell"
 import Viewer from 'react-viewer';
 import LazyMediaImage from "../../Components/LazyMediaImage";
+import { copyImageURLToClipboard } from "../../Utils/mediaCopy";
 
 
 export class ImageContent extends MediaMessageContent {
@@ -69,6 +70,36 @@ export class ImageCell extends MessageCell<any, ImageCellState> {
             showPreview: false,
             activeIndex: 0,
         }
+        this.onKeyDown = this.onKeyDown.bind(this)
+    }
+
+    componentDidMount() {
+    }
+
+    componentDidUpdate(_prevProps: any, prevState: ImageCellState) {
+        if (!prevState.showPreview && this.state.showPreview) {
+            document.addEventListener("keydown", this.onKeyDown)
+        }
+        if (prevState.showPreview && !this.state.showPreview) {
+            document.removeEventListener("keydown", this.onKeyDown)
+        }
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener("keydown", this.onKeyDown)
+    }
+
+    onKeyDown(event: KeyboardEvent) {
+        if (!this.state.showPreview || !(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "c") {
+            return
+        }
+        const target = event.target as HTMLElement | null
+        const tagName = target?.tagName?.toLowerCase()
+        if (tagName === "input" || tagName === "textarea" || target?.isContentEditable) {
+            return
+        }
+        event.preventDefault()
+        this.copyPreviewImage()
     }
 
     displayContent(message = this.props.message): ImageContent {
@@ -135,6 +166,12 @@ export class ImageCell extends MessageCell<any, ImageCellState> {
     originalDownloadToolbar(images: PreviewImage[]) {
         return (toolbars: any[]) => {
             return toolbars.filter((item) => item.key !== "download").concat({
+                key: "copyCurrent",
+                render: <span className="wk-image-preview-copy">复制</span>,
+                onClick: () => {
+                    this.copyPreviewImage(images)
+                },
+            }, {
                 key: "downloadOriginal",
                 render: <i className="react-viewer-icon react-viewer-icon-download" />,
                 onClick: () => {
@@ -143,6 +180,11 @@ export class ImageCell extends MessageCell<any, ImageCellState> {
                 },
             })
         }
+    }
+
+    copyPreviewImage(images = this.buildPreviewImages().images) {
+        const current = images[this.state.activeIndex] || images[0]
+        copyImageURLToClipboard(current?.src)
     }
 
     getImageSrc(content: ImageContent, thumbnail = false, download = false) {

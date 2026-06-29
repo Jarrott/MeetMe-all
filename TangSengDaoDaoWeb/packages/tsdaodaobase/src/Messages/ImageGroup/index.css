@@ -1,0 +1,60 @@
+.wk-image-group-grid {
+    position: relative;
+}
+
+.wk-image-group-menu {
+    position: absolute;
+    z-index: 9999;
+    width: 104px;
+    padding: 6px 0;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+}
+
+.wk-image-group-menu button {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 14px;
+    border: 0;
+    background: transparent;
+    color: #1f2937;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 18px;
+    text-align: left;
+}
+
+.wk-image-group-menu button:hover {
+    background: rgba(236, 93, 65, 0.08);
+    color: var(--wk-color-theme);
+}
+
+.wk-image-preview-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 28px;
+    color: #ffffff;
+    font-size: 13px;
+    line-height: 28px;
+}
+
+body[theme-mode=dark] .wk-image-group-menu {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: #1f2937;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+}
+
+body[theme-mode=dark] .wk-image-group-menu button {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+body[theme-mode=dark] .wk-image-group-menu button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}

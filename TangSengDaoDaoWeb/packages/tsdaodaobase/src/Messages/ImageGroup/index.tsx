@@ -8,6 +8,8 @@ import MessageHead from "../Base/head"
 import MessageTrail from "../Base/tail"
 import { MessageCell } from "../MessageCell"
 import LazyMediaImage from "../../Components/LazyMediaImage"
+import { copyImageURLToClipboard } from "../../Utils/mediaCopy"
+import "./index.css"
 
 export interface ImageGroupItem {
     file?: File
@@ -78,6 +80,10 @@ export class ImageGroupContent extends MediaMessageContent {
 interface ImageGroupCellState {
     showPreview: boolean
     activeIndex: number
+    menuVisible: boolean
+    menuX: number
+    menuY: number
+    menuIndex: number
 }
 
 interface PreviewImage {
@@ -92,7 +98,52 @@ export class ImageGroupCell extends MessageCell<any, ImageGroupCellState> {
         this.state = {
             showPreview: false,
             activeIndex: 0,
+            menuVisible: false,
+            menuX: 0,
+            menuY: 0,
+            menuIndex: 0,
         }
+        this.hideMenu = this.hideMenu.bind(this)
+        this.onKeyDown = this.onKeyDown.bind(this)
+    }
+
+    componentDidMount() {
+        document.addEventListener("click", this.hideMenu)
+        document.addEventListener("scroll", this.hideMenu, true)
+    }
+
+    componentDidUpdate(_prevProps: any, prevState: ImageGroupCellState) {
+        if (!prevState.showPreview && this.state.showPreview) {
+            document.addEventListener("keydown", this.onKeyDown)
+        }
+        if (prevState.showPreview && !this.state.showPreview) {
+            document.removeEventListener("keydown", this.onKeyDown)
+        }
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener("click", this.hideMenu)
+        document.removeEventListener("scroll", this.hideMenu, true)
+        document.removeEventListener("keydown", this.onKeyDown)
+    }
+
+    hideMenu() {
+        if (this.state.menuVisible) {
+            this.setState({ menuVisible: false })
+        }
+    }
+
+    onKeyDown(event: KeyboardEvent) {
+        if (!this.state.showPreview || !(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "c") {
+            return
+        }
+        const target = event.target as HTMLElement | null
+        const tagName = target?.tagName?.toLowerCase()
+        if (tagName === "input" || tagName === "textarea" || target?.isContentEditable) {
+            return
+        }
+        event.preventDefault()
+        this.copyPreviewImage()
     }
 
     displayContent(): ImageGroupContent {
@@ -133,6 +184,12 @@ export class ImageGroupCell extends MessageCell<any, ImageGroupCellState> {
     originalDownloadToolbar(images: PreviewImage[]) {
         return (toolbars: any[]) => {
             return toolbars.filter((item) => item.key !== "download").concat({
+                key: "copyCurrent",
+                render: <span className="wk-image-preview-copy">复制</span>,
+                onClick: () => {
+                    this.copyPreviewImage(images)
+                },
+            }, {
                 key: "downloadOriginal",
                 render: <i className="react-viewer-icon react-viewer-icon-download" />,
                 onClick: () => {
@@ -174,6 +231,16 @@ export class ImageGroupCell extends MessageCell<any, ImageGroupCellState> {
         }).filter((item) => item.src !== "")
     }
 
+    copyPreviewImage(images = this.buildPreviewImages()) {
+        const current = images[this.state.activeIndex] || images[0]
+        copyImageURLToClipboard(current?.src)
+    }
+
+    copyImageAt(index: number) {
+        const image = this.buildPreviewImages()[index]
+        copyImageURLToClipboard(image?.src)
+    }
+
     getGridStyle(count: number): React.CSSProperties {
         const visibleCount = Math.min(count, 4)
         const width = visibleCount === 1 ? 250 : 252
@@ -201,6 +268,18 @@ export class ImageGroupCell extends MessageCell<any, ImageGroupCellState> {
                 showPreview: true,
                 activeIndex: index,
             })
+        }} onContextMenu={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            const grid = (event.currentTarget.parentElement || event.currentTarget).getBoundingClientRect()
+            const menuWidth = 104
+            const menuHeight = 116
+            this.setState({
+                menuVisible: true,
+                menuIndex: index,
+                menuX: Math.max(8, Math.min(event.clientX - grid.left, grid.width - menuWidth - 8)),
+                menuY: Math.max(8, Math.min(event.clientY - grid.top, grid.height - menuHeight - 8)),
+            })
         }}>
             {
                 src ? <LazyMediaImage alt="" src={src} fallbackSrc={item.imgData} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} /> : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#999", fontSize: 13 }}>图片加载失败</div>
@@ -210,6 +289,33 @@ export class ImageGroupCell extends MessageCell<any, ImageGroupCellState> {
                     +{remainingCount}张
                 </div> : null
             }
+        </div>
+    }
+
+    renderThumbMenu() {
+        const { menuVisible, menuX, menuY, menuIndex } = this.state
+        if (!menuVisible) {
+            return null
+        }
+        const previewImages = this.buildPreviewImages()
+        const image = previewImages[menuIndex]
+        return <div className="wk-image-group-menu" style={{ left: menuX, top: menuY }} onClick={(event) => {
+            event.stopPropagation()
+        }}>
+            <button type="button" onClick={() => {
+                this.copyImageAt(menuIndex)
+                this.hideMenu()
+            }}>复制图片</button>
+            <button type="button" onClick={() => {
+                this.hideMenu()
+                if (previewImages.length > 0) {
+                    this.setState({ showPreview: true, activeIndex: menuIndex })
+                }
+            }}>预览</button>
+            <button type="button" onClick={() => {
+                this.hideMenu()
+                this.downloadOriginalImage(image?.downloadUrl || image?.src)
+            }}>下载原图</button>
         </div>
     }
 
@@ -232,8 +338,9 @@ export class ImageGroupCell extends MessageCell<any, ImageGroupCellState> {
         return <MessageBase context={context} message={message}>
             <div>
                 <MessageHead message={message} alwaysShow={true} />
-                <div style={this.getGridStyle(images.length)}>
+                <div className="wk-image-group-grid" style={this.getGridStyle(images.length)}>
                     {visibleImages.map((item, index) => this.renderThumb(item, index, images.length))}
+                    {this.renderThumbMenu()}
                 </div>
                 {this.renderCaption()}
                 <div style={{ marginTop: 4, textAlign: message.send ? "right" : "left" }}>

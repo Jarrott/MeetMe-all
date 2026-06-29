@@ -89,6 +89,30 @@
         <el-button type="primary" :loading="profileSaving" @click="onSaveProfile">保存</el-button>
       </template>
     </el-dialog>
+    <el-dialog v-model="resetPasswordDialogVisible" title="重置用户密码" width="420px" append-to-body @closed="onResetPasswordDialogClosed">
+      <el-form label-width="86px">
+        <el-form-item label="用户">
+          <el-input :model-value="`${resetPasswordForm.name} (${resetPasswordForm.uid})`" disabled />
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input v-model="resetPasswordForm.new_password" type="password" show-password maxlength="64" placeholder="请输入新密码" />
+        </el-form-item>
+        <el-form-item label="确认密码">
+          <el-input
+            v-model="resetPasswordForm.new_password_confirmation"
+            type="password"
+            show-password
+            maxlength="64"
+            placeholder="请再次输入新密码"
+            @keyup.enter="onSubmitResetPassword"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="resetPasswordDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="resetPasswordSaving" @click="onSubmitResetPassword">确认重置</el-button>
+      </template>
+    </el-dialog>
   </bd-page>
 </template>
 
@@ -105,7 +129,7 @@ import Devices from '@/pages/message/components/Devices.vue';
 import { useUserStore } from '@/stores/modules/user';
 import { BU_DOU_CONFIG } from '@/config';
 // API 接口
-import { userListGet, userLiftbanPut, userProfilePut } from '@/api/user';
+import { userListGet, userLiftbanPut, userProfilePut, userResetPasswordPost } from '@/api/user';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -272,6 +296,12 @@ const column = reactive<Column.ColumnOptions[]>([
                       <i-bd-editor class={'mr-4px'} />
                       编辑资料
                     </ElDropdownItem>
+                    {userStore.userInfo.role === 'superAdmin' ? (
+                      <ElDropdownItem onClick={() => onResetPassword(scope.row)}>
+                        <i-bd-lock class={'mr-4px'} />
+                        重置密码
+                      </ElDropdownItem>
+                    ) : null}
                     <ElDropdownItem onClick={() => onUseLiftban(scope.row)}>
                       <i-bd-info class={'mr-4px'} />
                       {scope.row.status === 1 ? '封禁' : '解禁'}
@@ -358,6 +388,62 @@ const onSaveProfile = () => {
     })
     .finally(() => {
       profileSaving.value = false;
+    });
+};
+
+const resetPasswordDialogVisible = ref(false);
+const resetPasswordSaving = ref(false);
+const resetPasswordForm = reactive({
+  uid: '',
+  name: '',
+  new_password: '',
+  new_password_confirmation: ''
+});
+
+const onResetPassword = (item: any) => {
+  resetPasswordForm.uid = item.uid;
+  resetPasswordForm.name = item.name || item.username || item.uid;
+  resetPasswordForm.new_password = '';
+  resetPasswordForm.new_password_confirmation = '';
+  resetPasswordDialogVisible.value = true;
+};
+
+const onResetPasswordDialogClosed = () => {
+  resetPasswordForm.uid = '';
+  resetPasswordForm.name = '';
+  resetPasswordForm.new_password = '';
+  resetPasswordForm.new_password_confirmation = '';
+};
+
+const onSubmitResetPassword = () => {
+  if (!resetPasswordForm.uid) {
+    ElMessage.error('用户ID不能为空');
+    return;
+  }
+  if (resetPasswordForm.new_password.length < 6) {
+    ElMessage.error('密码长度至少 6 位');
+    return;
+  }
+  if (resetPasswordForm.new_password !== resetPasswordForm.new_password_confirmation) {
+    ElMessage.error('两次密码不一致');
+    return;
+  }
+
+  resetPasswordSaving.value = true;
+  userResetPasswordPost({
+    uid: resetPasswordForm.uid,
+    new_password: resetPasswordForm.new_password,
+    new_password_confirmation: resetPasswordForm.new_password_confirmation
+  })
+    .then(() => {
+      resetPasswordDialogVisible.value = false;
+      ElMessage.success('用户密码已重置');
+    })
+    .catch(err => {
+      ElMessage.error(err?.msg || '重置用户密码失败');
+    })
+    .finally(() => {
+      resetPasswordSaving.value = false;
     });
 };
 

@@ -54,6 +54,15 @@ export function userProfilePut(uid: string, data: any) {
   });
 }
 
+// 重置用户密码
+export function userResetPasswordPost(data: any) {
+  return request({
+    url: '/manager/user/resetpassword',
+    method: 'post',
+    data
+  });
+}
+
 // 好友列表
 export function userFriendsGet(params: any) {
   return request({

@@ -510,15 +510,39 @@ export default class ImageToolbar extends Component<ImageToolbarProps, ImageTool
         }
     }
 
+    hasUsableImageItem(item?: Partial<ImagePreviewItem>) {
+        return !!item?.file && item.file.size > 0 && !!item.previewUrl
+    }
+
+    validateImageItems(items?: ImagePreviewItem[]) {
+        if (!items || items.length === 0) {
+            Toast.warning("请选择图片后再发送")
+            return false
+        }
+        const invalidIndex = items.findIndex((item) => !this.hasUsableImageItem(item))
+        if (invalidIndex >= 0) {
+            Toast.error("图片读取未完成，请重新选择图片")
+            return false
+        }
+        return true
+    }
+
     sendImageItem(item: ImagePreviewItem, caption = "", mention?: MentionModel) {
+        if (!this.validateImageItems([item])) {
+            return false
+        }
         const { conversationContext } = this.props
         const content = new ImageContent(item.file, item.previewUrl, item.width, item.height, item.thumbUrl, caption)
         ;(content as any).extension = item.extension || this.imageExtension(item.file)
         this.applyMention(content, mention)
         conversationContext.sendMessage(content)
+        return true
     }
 
     sendImageGroup(items: ImagePreviewItem[], caption = "", mention?: MentionModel) {
+        if (!this.validateImageItems(items)) {
+            return false
+        }
         const { conversationContext } = this.props
         const content = new ImageGroupContent(items.map((item) => {
             return {
@@ -532,6 +556,7 @@ export default class ImageToolbar extends Component<ImageToolbarProps, ImageTool
         }), caption)
         this.applyMention(content, mention)
         conversationContext.sendMessage(content)
+        return true
     }
 
     sendPendingImages(caption = "", mention?: MentionModel) {
@@ -540,10 +565,14 @@ export default class ImageToolbar extends Component<ImageToolbarProps, ImageTool
             return false
         }
         const safeCaption = (caption || "").trim()
+        let sent = false
         if (imageItems.length === 1) {
-            this.sendImageItem(imageItems[0], safeCaption, mention)
+            sent = this.sendImageItem(imageItems[0], safeCaption, mention)
         } else {
-            this.sendImageGroup(imageItems, safeCaption, mention)
+            sent = this.sendImageGroup(imageItems, safeCaption, mention)
+        }
+        if (!sent) {
+            return true
         }
         this.setState({
             fileType: undefined,
@@ -573,26 +602,35 @@ export default class ImageToolbar extends Component<ImageToolbarProps, ImageTool
         const {conversationContext} = this.props
         const {  file, previewUrl,width,height,fileType,imageItems } = this.state
         const caption = (this.imageCaption || "").trim()
+        let sent = true
         if(fileType === "image") {
             if (imageItems && imageItems.length > 0) {
                 if (imageItems.length === 1) {
-                    this.sendImageItem(imageItems[0], caption)
+                    sent = this.sendImageItem(imageItems[0], caption)
                 } else {
-                    this.sendImageGroup(imageItems, caption)
+                    sent = this.sendImageGroup(imageItems, caption)
                 }
             } else {
-                this.sendImageItem({
-                    file,
-                    previewUrl,
-                    width: width || 0,
-                    height: height || 0,
-                    extension: this.imageExtension(file),
-                }, caption)
+                if (!this.hasUsableImageItem({ file, previewUrl })) {
+                    Toast.error("图片读取未完成，请重新选择图片")
+                    sent = false
+                } else {
+                    sent = this.sendImageItem({
+                        file,
+                        previewUrl,
+                        width: width || 0,
+                        height: height || 0,
+                        extension: this.imageExtension(file),
+                    }, caption)
+                }
             }
         } else if(fileType === "video") {
             this.sendVideo(caption)
         } else if(fileType === "file") {
             conversationContext.sendMessage(new FileContent(file))
+        }
+        if (!sent) {
+            return
         }
        
         this.setState({

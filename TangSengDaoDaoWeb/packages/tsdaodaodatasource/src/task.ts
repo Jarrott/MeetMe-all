@@ -67,6 +67,9 @@ export class MediaMessageUploadTask extends MessageTask {
         try {
             for (let index = 0; index < images.length; index++) {
                 const item = images[index]
+                if (!item.url && !item.file) {
+                    throw new Error(`missing image source at index ${index}`)
+                }
                 if (!item.url && item.file) {
                     const ext = item.extension || this.fileExtension(item.file.name) || ".png"
                     const path = `/${this.message.channel.channelType}/${this.message.channel.channelID}/${this.getUUID()}${ext}`
@@ -83,7 +86,11 @@ export class MediaMessageUploadTask extends MessageTask {
                 this._progress = Math.min(0.99, (index + 1) / images.length)
                 this.update()
             }
-            content.remoteUrl = images.find((item: any) => item.url)?.url || "image-group"
+            const emptyURLIndex = images.findIndex((item: any) => !item.url)
+            if (emptyURLIndex >= 0) {
+                throw new Error(`missing uploaded image url at index ${emptyURLIndex}`)
+            }
+            content.remoteUrl = images[0]?.url || ""
             content.file = undefined
             this._progress = 1
             this.status = TaskStatus.success

@@ -29,3 +29,9 @@
 logs/
 
 wukongimdata/
+
+# Local APNS/private push credentials
+configs/push/*.p8
+configs/push/*.p12
+docker/tsdd/configs/push/*.p8
+docker/tsdd/configs/push/*.p12

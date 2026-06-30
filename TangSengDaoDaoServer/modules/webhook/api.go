@@ -52,10 +52,11 @@ func New(ctx *config.Context) *Webhook {
 	oppo := ctx.GetConfig().Push.OPPO
 	vivo := ctx.GetConfig().Push.VIVO
 	firebase := ctx.GetConfig().Push.FIREBASE
+	apnsTokenAuth := loadAPNSTokenAuthConfig(ctx.GetConfig())
 
-	if apns.Topic != "" && apns.Cert != "" {
+	if apns.Topic != "" && (apns.Cert != "" || apnsTokenAuth.enabled()) {
 		pushMap[common.DeviceTypeIOS] = map[string]Push{
-			ctx.GetConfig().Push.APNS.Topic: NewIOSPush(apns.Topic, apns.Dev, apns.Cert, apns.Password),
+			ctx.GetConfig().Push.APNS.Topic: NewIOSPush(apns.Topic, apns.Dev, apns.Cert, apns.Password, apnsTokenAuth),
 		}
 	}
 	if mi.PackageName != "" {

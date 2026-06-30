@@ -76,6 +76,10 @@ minio: # minio配置
 #    topic: "" # topic 例如： com.xinbida.tangsengdaodao
 #    password: ""
 #    cert: "" # apns证书路径 例如：configs/push/push.p12
+#    authType: "p8" # 可选，配置为 p8 后使用 APNs token auth
+#    keyID: "" # Apple Developer Keys 中的 Key ID
+#    teamID: "" # Apple Developer Team ID
+#    authKey: "" # p8密钥路径，例如：configs/push/AuthKey_XXXXXXXXXX.p8
 #  hms: # 华为推送
 #    packageName: "" # 华为推送包名 例如：com.xinbida.tangsengdaodao  
 #    appID: "" # 华为推送appID

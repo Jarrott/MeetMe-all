@@ -33,6 +33,7 @@ services:
       - "8090:8090"
     volumes:
       - ./configs/tsdd.yaml:/home/configs/tsdd.yaml
+      - ./configs/push:/home/configs/push:ro
       - ./logs/tsdd:/home/logs
   tangsengdaodaoweb:  # 唐僧叨叨的web服务
     image: registry.cn-shanghai.aliyuncs.com/wukongim/tangsengdaodaoweb:latest

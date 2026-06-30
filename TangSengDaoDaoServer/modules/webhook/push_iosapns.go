@@ -3,6 +3,7 @@ package webhook
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/TangSengDaoDao/TangSengDaoDaoServer/modules/user"
 	"github.com/TangSengDaoDao/TangSengDaoDaoServerLib/config"
@@ -10,6 +11,7 @@ import (
 	"github.com/TangSengDaoDao/TangSengDaoDaoServerLib/pkg/util"
 	"github.com/sideshow/apns2"
 	"github.com/sideshow/apns2/certificate"
+	apnstoken "github.com/sideshow/apns2/token"
 )
 
 // IOSPayload iOS负载
@@ -27,37 +29,66 @@ func NewIOSPayload(payloadInfo *PayloadInfo) Payload {
 
 // IOSPush IOSPush
 type IOSPush struct {
-	client      *apns2.Client
-	topic       string
-	password    string
-	p12FilePath string
-	dev         bool // 是否是开发环境
+	client          *apns2.Client
+	topic           string
+	password        string
+	p12FilePath     string
+	tokenAuthKeyID  string
+	tokenAuthTeamID string
+	tokenAuthKey    string
+	dev             bool // 是否是开发环境
 	log.Log
 }
 
 // NewIOSPush NewIOSPush
-func NewIOSPush(topic string, dev bool, p12FilePath string, password string) *IOSPush {
+func NewIOSPush(topic string, dev bool, p12FilePath string, password string, tokenAuth apnsTokenAuthConfig) *IOSPush {
 	return &IOSPush{
-		topic:       topic,
-		dev:         dev,
-		p12FilePath: p12FilePath,
-		password:    password,
-		Log:         log.NewTLog("IOSPush"),
+		topic:           topic,
+		dev:             dev,
+		p12FilePath:     p12FilePath,
+		password:        password,
+		tokenAuthKeyID:  tokenAuth.KeyID,
+		tokenAuthTeamID: tokenAuth.TeamID,
+		tokenAuthKey:    tokenAuth.AuthKey,
+		Log:             log.NewTLog("IOSPush"),
 	}
 }
 
 func (p *IOSPush) createClient() (*apns2.Client, error) {
+	if p.tokenAuthEnabled() {
+		if strings.TrimSpace(p.tokenAuthKeyID) == "" || strings.TrimSpace(p.tokenAuthTeamID) == "" || strings.TrimSpace(p.tokenAuthKey) == "" {
+			return nil, errors.New("apns p8配置不完整：keyID、teamID、authKey不能为空")
+		}
+		authKey, err := apnstoken.AuthKeyFromFile(p.tokenAuthKey)
+		if err != nil {
+			return nil, err
+		}
+		token := &apnstoken.Token{
+			AuthKey: authKey,
+			KeyID:   p.tokenAuthKeyID,
+			TeamID:  p.tokenAuthTeamID,
+		}
+		return p.selectAPNSEnvironment(apns2.NewTokenClient(token)), nil
+	}
+	if strings.TrimSpace(p.p12FilePath) == "" {
+		return nil, errors.New("apns p12证书路径不能为空")
+	}
 	cert, err := certificate.FromP12File(p.p12FilePath, p.password)
 	if err != nil {
 		return nil, err
 	}
-	var client *apns2.Client
+	return p.selectAPNSEnvironment(apns2.NewClient(cert)), nil
+}
+
+func (p *IOSPush) tokenAuthEnabled() bool {
+	return strings.TrimSpace(p.tokenAuthKeyID) != "" || strings.TrimSpace(p.tokenAuthTeamID) != "" || strings.TrimSpace(p.tokenAuthKey) != ""
+}
+
+func (p *IOSPush) selectAPNSEnvironment(client *apns2.Client) *apns2.Client {
 	if p.dev {
-		client = apns2.NewClient(cert).Development()
-	} else {
-		client = apns2.NewClient(cert).Production()
+		return client.Development()
 	}
-	return client, nil
+	return client.Production()
 }
 
 // GetPayload 获取推送负载

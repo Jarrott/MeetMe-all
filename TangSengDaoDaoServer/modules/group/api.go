@@ -312,14 +312,14 @@ func (g *Group) avatarUpload(c *wkhttp.Context) {
 		return
 	}
 
-	isCreator, err := g.db.QueryIsGroupCreator(groupNo, loginUID)
+	isCreatorOrManager, err := g.db.QueryIsGroupManagerOrCreator(groupNo, loginUID)
 	if err != nil {
-		g.Error("查询群创建者失败！", zap.Error(err))
-		c.ResponseError(errors.New("查询群创建者失败！"))
+		g.Error("查询群管理者失败！", zap.Error(err))
+		c.ResponseError(errors.New("查询群管理者失败！"))
 		return
 	}
-	if !isCreator {
-		c.ResponseError(errors.New("只有创建者才能修改头像"))
+	if !isCreatorOrManager {
+		c.ResponseError(errors.New("只有群主或管理员才能修改头像"))
 		return
 	}
 

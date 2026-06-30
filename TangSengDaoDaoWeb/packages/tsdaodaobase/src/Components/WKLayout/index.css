@@ -35,9 +35,9 @@
 .wk-layout-content-resizer {
     position: absolute;
     top: 0;
-    right: -4px;
+    right: 0;
     z-index: 30;
-    width: 10px;
+    width: 12px;
     height: 100%;
     cursor: col-resize;
 }
@@ -46,11 +46,11 @@
     content: "";
     position: absolute;
     top: 0;
-    left: 4px;
+    right: 0;
     width: 2px;
     height: 100%;
     background: rgba(9, 30, 66, 0.12);
-    opacity: 0;
+    opacity: 0.35;
     transition: opacity 120ms ease, background-color 120ms ease;
 }
 
